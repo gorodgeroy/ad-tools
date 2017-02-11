@@ -4,7 +4,7 @@ Add-Type -assembly System.Windows.Forms
 # Параметры формы
 function Form-Create {
     $main_form = New-Object System.Windows.Forms.Form
-    $main_form.Text = 'Волшебная выгружалка данных из AD by Dmitry Pronyaev'
+    $main_form.Text = 'gorodgeroy AD TOOLS'
     $main_form.Width = 640
     $main_form.Height = 480
     $main_form.AutoSize = $true
@@ -46,6 +46,12 @@ function Form-Create {
     $TextboxInput.Text = ''
     $main_form.Controls.Add($TextboxInput)
 
+    $ButtonCompare = New-Object System.Windows.Forms.Button
+    $ButtonCompare.Location = New-Object System.Drawing.Point(310,60)
+    $ButtonCompare.Text = 'Сравнить'
+    $ButtonCompare.AutoSize = $true
+    $ButtonCompare.Add_Click({(Get-Compare)})
+    $main_form.Controls.Add($ButtonCompare)
     
     $LabelInput1 = New-Object System.Windows.Forms.Label
     $LabelInput1.Text = 'Имя пользователя или группы для сравнения'
@@ -105,6 +111,13 @@ function Form-Create {
     $main_form.Controls.Add($GetData)
     $main_form.ShowDialog()
 }
+
+# Обработка нажатия кнопки "Сравнить"
+
+function Get-Compare {
+    #TODO сравнить объекты, на которые ссылаются $TextboxInput и $TextboxInput1
+}
+
 
 #Обработка нажатия кнопки "Получить данные"
 Function Get-Data
