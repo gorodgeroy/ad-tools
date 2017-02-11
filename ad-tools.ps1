@@ -35,7 +35,7 @@ function Form-Create {
     $main_form.Controls.Add($TextExclude)
 
     $LabelInput = New-Object System.Windows.Forms.Label
-    $LabelInput.Text = 'Введите имя пользователя или группы'
+    $LabelInput.Text = 'Имя пользователя или группы'
     $LabelInput.Location = New-Object System.Drawing.Point(200,20)
     $LabelInput.AutoSize = $true
     $main_form.Controls.Add($LabelInput)
@@ -46,14 +46,27 @@ function Form-Create {
     $TextboxInput.Text = ''
     $main_form.Controls.Add($TextboxInput)
 
+    
+    $LabelInput1 = New-Object System.Windows.Forms.Label
+    $LabelInput1.Text = 'Имя пользователя или группы для сравнения'
+    $LabelInput1.Location = New-Object System.Drawing.Point(400,20)
+    $LabelInput1.AutoSize = $true
+    $main_form.Controls.Add($LabelInput1)
+    
+    $TextboxInput1 = New-Object System.Windows.Forms.TextBox
+    $TextboxInput1.Location = New-Object System.Drawing.Point(400,60)
+    $TextboxInput1.AutoSize = $true
+    $TextboxInput1.Text = ''
+    $main_form.Controls.Add($TextboxInput1)
+
     $LabelOutput = New-Object System.Windows.Forms.Label
     $LabelOutput.Text = 'Результат'
-    $LabelOutput.Location = New-Object System.Drawing.Point(460,20)
+    $LabelOutput.Location = New-Object System.Drawing.Point(660,20)
     $LabelOutput.AutoSize = $true
     $main_form.Controls.Add($LabelOutput)
 
     $TextboxOutput = New-Object System.Windows.Forms.RichTextBox
-    $TextboxOutput.Location = New-Object System.Drawing.Point(460,40)
+    $TextboxOutput.Location = New-Object System.Drawing.Point(660,40)
     $TextboxOutput.Size = New-Object System.Drawing.Size(400,300)
     $TextboxOutput.Multiline = $true
     $TextboxOutput.ReadOnly = $true
