@@ -51,7 +51,7 @@ function Form-Create {
     $ButtonCompare.Text = 'Сравнить'
     $ButtonCompare.AutoSize = $true
     $ButtonCompare.Add_Click({(Get-Compare)})
-    $main_form.Controls.Add($ButtonCompare)
+    #$main_form.Controls.Add($ButtonCompare)
     
     $LabelInput1 = New-Object System.Windows.Forms.Label
     $LabelInput1.Text = 'Имя пользователя или группы для сравнения'
@@ -159,6 +159,54 @@ Function GetUserGroups
     if ($TextboxInput.Text -eq '') {
         $ListConsole.Items.Add('Имя юзера-то введи, например')
         }
+    ElseIf ($TextboxInput1.Text -ne '') {
+        $TextboxOutput.AppendText("#################################################")
+        $TextboxOutput.AppendText("`n")
+        $TextboxOutput.AppendText("Группы первого пользователя:")
+        $TextboxOutput.AppendText("`n")
+        $TextboxOutput.AppendText("#################################################")
+        $TextboxOutput.AppendText("`n")
+        $UserGroups1 = UserMembership $TextboxInput.Text | Sort Memberof
+        $UserGroups1 = $UserGroups1 | Foreach {$_ -replace "\\#", "#"}
+        $UserGroups1 = $UserGroups1 | Foreach {$_ -replace "@{Memberof=", ""}
+        $UserGroups1 = $UserGroups1 | Foreach {$_ -replace "}", ""} 
+        ForEach ($UserGroup1 in $UserGroups1) {
+            $TextboxOutput.AppendText($UserGroup1)
+            $TextboxOutput.AppendText("`n")
+            }
+        $TextboxOutput.AppendText("#################################################")
+        $TextboxOutput.AppendText("`n")
+        $TextboxOutput.AppendText("Группы второго пользователя:")
+        $TextboxOutput.AppendText("`n")
+        $TextboxOutput.AppendText("#################################################")
+        $TextboxOutput.AppendText("`n")
+        $UserGroups2 = UserMembership $TextboxInput1.Text | Sort Memberof
+        $UserGroups2 = $UserGroups2 | Foreach {$_ -replace "\\#", "#"}
+        $UserGroups2 = $UserGroups2 | Foreach {$_ -replace "@{Memberof=", ""}
+        $UserGroups2 = $UserGroups2 | Foreach {$_ -replace "}", ""} 
+        ForEach ($UserGroup2 in $UserGroups2)  {
+            $TextboxOutput.AppendText($UserGroup2)
+            $TextboxOutput.AppendText("`n")
+            }
+        $CompareResults = Compare-Object $UserGroups1  $UserGroups2 -IncludeEqual
+        $TextboxOutput.AppendText("#################################################")
+        $TextboxOutput.AppendText("`n")
+        $TextboxOutput.AppendText("<= - только в первой группе")
+        $TextboxOutput.AppendText("`n")
+        $TextboxOutput.AppendText("=> - только в первой группе")
+        $TextboxOutput.AppendText("`n")
+        $TextboxOutput.AppendText("== - в обеих группах")
+        $TextboxOutput.AppendText("`n")
+        $TextboxOutput.AppendText("#################################################")
+        $TextboxOutput.AppendText("`n")
+        ForEach ($CompareResult in $CompareResults) {
+            $CompareResult = $CompareResult | Foreach {$_ -replace "@{InputObject=", ""}
+            $CompareResult = $CompareResult | Foreach {$_ -replace "; SideIndicator=", " "}
+            $CompareResult = $CompareResult | Foreach {$_ -replace "}", ""}
+            $TextboxOutput.AppendText($CompareResult)
+            $TextboxOutput.AppendText("`n")
+            }
+    }
     Else {
         $Result = UserMembership $TextboxInput.Text | Sort Memberof
         $Result = $Result | Foreach {$_ -replace "\\#", "#"}
@@ -166,8 +214,7 @@ Function GetUserGroups
         $Result = $Result | Foreach {$_ -replace "}", ""} | ForEach-Object {
             $TextboxOutput.AppendText($_)
             $TextboxOutput.AppendText("`n")
-        }
-
+            }
     }
 
 }
@@ -185,7 +232,7 @@ Function Get-UserMembership
             $ListConsole.Items.Add('Небось юзернейм неверный')
             Return $Nothing
         }
-        $GroupItems = @()
+        $GroupItems = @()        
         ForEach ($Group in $Groups)
         {
           $var = $group.split(",")
@@ -206,7 +253,38 @@ Function GetGroupMembership
     if ($TextboxInput.Text -eq '') {
         $ListConsole.Items.Add('Имя группы-то введи, например')
         }
-    Else {
+    Elseif ($TextboxInput1 -ne '')
+         {
+            $TextboxOutput.AppendText("#################################################")
+            $TextboxOutput.AppendText("`n")
+            $TextboxOutput.AppendText("Группы первого объекта:")
+            $TextboxOutput.AppendText("`n")
+            $TextboxOutput.AppendText("#################################################")
+        $TextboxOutput.AppendText("`n")
+            $Result1 = Get-GroupMembership $TextboxInput.Text | Sort Memberof
+            $Result1 = $Result1 | Foreach {$_ -replace "\\#", "#"}
+            $Result1 = $Result1 | Foreach {$_ -replace "@{Memberof=", ""}
+            $Result1 = $Result1 | Foreach {$_ -replace "}", ""} | ForEach-Object {
+            $TextboxOutput.AppendText($_)
+            $TextboxOutput.AppendText("`n")
+            }
+            $TextboxOutput.AppendText("#################################################")
+            $TextboxOutput.AppendText("`n")
+            $TextboxOutput.AppendText("Группы второго объекта:")
+            $TextboxOutput.AppendText("`n")
+            $TextboxOutput.AppendText("#################################################")
+            $TextboxOutput.AppendText("`n")
+            $Result2 = Get-GroupMembership $TextboxInput.Text | Sort Memberof
+            $Result2 = $Result2 | Foreach {$_ -replace "\\#", "#"}
+            $Result2 = $Result2 | Foreach {$_ -replace "@{Memberof=", ""}
+            $Result2 = $Result2 | Foreach {$_ -replace "}", ""} | ForEach-Object {
+            $TextboxOutput.AppendText($_)
+            $TextboxOutput.AppendText("`n")
+            $TextboxOutput.AppendText("#################################################")
+            }
+    }
+    Else 
+        {
         $Result = Get-GroupMembership $TextboxInput.Text | Sort Memberof
         $Result = $Result | Foreach {$_ -replace "\\#", "#"}
         $Result = $Result | Foreach {$_ -replace "@{Memberof=", ""}
@@ -214,7 +292,6 @@ Function GetGroupMembership
             $TextboxOutput.AppendText($_)
             $TextboxOutput.AppendText("`n")
         }
-
     }
 
 }
@@ -254,10 +331,71 @@ Function GetGroupMembers
     if ($TextboxInput.Text -eq '') {
         $ListConsole.Items.Add('Имя группы-то введи, например')
         }
+    Elseif ($TextboxInput.Text -ne '') {
+    $GroupName1 = $TextboxInput.Text
+    $GroupName2 = $TextboxInput1.Text
+    try {
+        $GroupMembers1 = Get-ADGroupMember $GroupName1 | Select-Object -Property name
+    }
+    Catch {
+        $ListConsole.Items.Add('Небось имя первой группы неверное')
+        Return $nothing
+    }
+    try {
+        $GroupMembers2 = Get-ADGroupMember $GroupName2 | Select-Object -Property name
+    }
+    Catch {
+        $ListConsole.Items.Add('Небось имя второй группы неверное')
+        Return $nothing
+    }
+        $TextboxOutput.AppendText("#################################################")
+        $TextboxOutput.AppendText("`n")
+        $TextboxOutput.AppendText("Группы первого объекта:")
+        $TextboxOutput.AppendText("`n")
+        $TextboxOutput.AppendText("#################################################")
+        $TextboxOutput.AppendText("`n")
+        $GroupMembers1 = $GroupMembers1 | Foreach {$_ -replace "@{name=", ""}
+        $GroupMembers1 = $GroupMembers1 | Foreach {$_ -replace "}", ""}
+        ForEach ($GroupMember1 in $GroupMembers1) {
+            $TextboxOutput.AppendText($GroupMember1)
+            $TextboxOutput.AppendText("`n")
+        }
+        $TextboxOutput.AppendText("#################################################")
+        $TextboxOutput.AppendText("`n")
+        $TextboxOutput.AppendText("Группы второго объекта:")
+        $TextboxOutput.AppendText("`n")
+        $TextboxOutput.AppendText("#################################################")
+        $TextboxOutput.AppendText("`n")
+        $GroupMembers2 = $GroupMembers2 | Foreach {$_ -replace "@{name=", ""}
+        $GroupMembers2 = $GroupMembers2 | Foreach {$_ -replace "}", ""}
+        ForEach ($GroupMember2 in $GroupMembers2) {
+            $TextboxOutput.AppendText($GroupMember2)
+            $TextboxOutput.AppendText("`n")
+            }
+        $CompareResults = Compare-Object $GroupMembers1 $GroupMembers2 -IncludeEqual
+        $TextboxOutput.AppendText("#################################################")
+        $TextboxOutput.AppendText("`n")
+        $TextboxOutput.AppendText("<= - только в первой группе")
+        $TextboxOutput.AppendText("`n")
+        $TextboxOutput.AppendText("=> - только в первой группе")
+        $TextboxOutput.AppendText("`n")
+        $TextboxOutput.AppendText("== - в обеих группах")
+        $TextboxOutput.AppendText("`n")
+        $TextboxOutput.AppendText("#################################################")
+        $TextboxOutput.AppendText("`n")
+        ForEach ($CompareResult in $CompareResults) {
+            $CompareResult = $CompareResult | Foreach {$_ -replace "@{InputObject=", ""}
+            $CompareResult = $CompareResult | Foreach {$_ -replace "; SideIndicator=", " "}
+            $CompareResult = $CompareResult | Foreach {$_ -replace "}", ""}
+            $TextboxOutput.AppendText($CompareResult)
+            $TextboxOutput.AppendText("`n")
+            }
+    }
+    
     Else {
     $GroupName = $TextboxInput.Text
     try {
-        $GroupMembers = Get-ADGroupMember $GroupName | Select-Object -Property name
+        $GroupMembers = Get-ADGroupMember $GroupName1 | Select-Object -Property name
     }
     Catch {
         $ListConsole.Items.Add('Небось имя группы неверное')
